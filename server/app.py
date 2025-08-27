@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from db import init_db, db
 from models import Candidate
+from utils.parse_resume import extract_profile
 
 app = Flask(__name__, static_url_path='', static_folder='.')
 CORS(app)
@@ -114,7 +115,21 @@ def update_candidate(cid):
 
 @app.post('/api/parse-resume')
 def deprecated_parse():
-    return jsonify({'error': 'Endpoint deprecated'}), 410
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'Missing file field'}), 400
+        f = request.files['file']
+        filename = f.filename or ''
+        ext = '.' + filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+        if ext not in {'.pdf', '.doc', '.docx'}:
+            return jsonify({'error': 'Only PDF, DOC, DOCX are allowed'}), 400
+        f.seek(0, 2); size = f.tell(); f.seek(0)
+        if size > 10 * 1024 * 1024:
+            return jsonify({'error': 'File size must be ≤ 10MB'}), 400
+        data = extract_profile(f.stream, filename)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

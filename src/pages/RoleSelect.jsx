@@ -33,7 +33,7 @@ export default function RoleSelect() {
 
         <div className="mt-12 flex flex-col gap-6 sm:flex-row sm:justify-center">
           <ButtonPill to="/signup?role=recruiter" label="NHÀ TUYỂN DỤNG" />
-          <ButtonPill to="/candidate/new" label="ỨNG VIÊN" />
+          <ButtonPill to="/candidate/upload" label="ỨNG VIÊN" />
         </div>
       </section>
     </div>
