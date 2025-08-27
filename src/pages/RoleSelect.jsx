@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar.jsx";
 
 function ButtonPill({ to, label }) {
   return (
@@ -20,18 +21,7 @@ export default function RoleSelect() {
         <div className="absolute left-[-15%] bottom-[-10%] h-[520px] w-[520px] rounded-full bg-emerald-400/25 blur-3xl" />
         <div className="absolute inset-0 [mask-image:radial-gradient(900px_500px_at_50%_20%,black,transparent)] bg-black/20" />
       </div>
-
-      <header className="h-16 flex items-center">
-        <div className="mx-auto w-full max-w-7xl px-4 flex items-center justify-between">
-          <a href="/" className="font-semibold tracking-tight">JobJob</a>
-          <nav className="hidden md:flex items-center gap-8 text-sm">
-            <a className="hover:text-teal-300 transition-colors" href="#gioi-thieu">Giới thiệu</a>
-            <a className="hover:text-teal-300 transition-colors" href="#lien-he">Liên Hệ</a>
-            <a className="hover:text-teal-300 transition-colors" href="#goi-cuoc">Gói Cước</a>
-            <a className="hover:text-teal-300 transition-colors" href="#dang-ky">Đăng Ký</a>
-          </nav>
-        </div>
-      </header>
+      <Navbar />
 
       <section className="mx-auto w-full max-w-7xl px-4 pt-8 pb-20 flex flex-col items-center justify-center min-h-[calc(100svh-4rem)] text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight tracking-wide">
@@ -43,7 +33,7 @@ export default function RoleSelect() {
 
         <div className="mt-12 flex flex-col gap-6 sm:flex-row sm:justify-center">
           <ButtonPill to="/signup?role=recruiter" label="NHÀ TUYỂN DỤNG" />
-          <ButtonPill to="/signup?role=candidate" label="ỨNG VIÊN" />
+          <ButtonPill to="/candidate/new" label="ỨNG VIÊN" />
         </div>
       </section>
     </div>

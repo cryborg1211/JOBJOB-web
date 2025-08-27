@@ -1,20 +1,10 @@
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar.jsx";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#071a1d] text-white">
-      {/* Header */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-transparent">
-        <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between">
-          <div className="text-white font-extrabold text-xl">JobJob</div>
-          <nav className="hidden md:flex items-center gap-10 text-sm text-white/80">
-            <a href="#" className="hover:text-white">Giới thiệu</a>
-            <a href="#" className="hover:text-white">Liên Hệ</a>
-            <a href="#" className="hover:text-white">Gói Cước</a>
-            <a href="#" className="hover:text-white">Đăng Ký</a>
-          </nav>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero */}
       <section className="relative pt-32">
