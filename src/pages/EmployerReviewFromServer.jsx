@@ -3,28 +3,26 @@ import { useParams } from 'react-router-dom'
 import Navbar from '../components/Navbar.jsx'
 import { API_BASE } from '../lib/config'
 
-export default function CandidateReviewFromServer() {
+export default function EmployerReviewFromServer() {
   const { id } = useParams()
   const [data, setData] = useState(null)
   const [editing, setEditing] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/candidates/${id}`).then(r=>r.json()).then(setData)
+    fetch(`${API_BASE}/api/jobs/${id}`).then(r=>r.json()).then(setData)
   }, [id])
 
   if (!data) return null
 
   const save = async () => {
-    const res = await fetch(`${API_BASE}/api/candidates/${id}`, {
+    const res = await fetch(`${API_BASE}/api/jobs/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: data.name,
-        degree: data.degree,
-        languages: (data.languages || []).join(', '),
-        exp1: data.exp1, exp2: data.exp2,
-        skill1: data.skill1, skill2: data.skill2,
+        company: data.company,
+        title: data.title,
+        description: data.description,
       })
     })
     const json = await res.json()
@@ -56,6 +54,22 @@ export default function CandidateReviewFromServer() {
     );
   };
 
+  const LongDescription = ({ label, field }) => (
+    <div className="rounded-2xl bg-white/90 text-black px-5 py-4 border border-black/10 shadow-inner whitespace-pre-wrap break-words min-h-40">
+      {editing ? (
+        <textarea
+          rows={8}
+          className="w-full resize-none bg-transparent outline-none text-center caret-black placeholder:text-black/50 min-h-40"
+          value={data[field] || ""}
+          onChange={e => setData(prev => ({...prev, [field]: e.target.value}))}
+          placeholder={label}
+        />
+      ) : (
+        <span className="font-semibold block text-center">{data[field] || label}</span>
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-dvh bg-[#081A17] text-white">
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
@@ -65,25 +79,15 @@ export default function CandidateReviewFromServer() {
       </div>
       <Navbar />
       <section className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-12 md:py-16 text-center">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extralight tracking-wide">Hồ Sơ Của Bạn</h1>
-        <div className="mx-auto mt-10 rounded-[28px] bg-[#1CDAC4] px-6 py-10 sm:px-10 sm:py-12 max-w-lg shadow-[0_30px_120px_rgba(0,0,0,0.35)]">
-          <div className="mx-auto mb-6 h-24 w-24 overflow-hidden rounded-full ring-4 ring-teal-300/60 shadow">
-            {data.avatar_url ? <img src={data.avatar_url} alt="avatar" className="h-full w-full object-cover" /> : <div />}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extralight tracking-wide">Mô Tả Công Việc</h1>
+        <div className="mx-auto mt-10 rounded-[28px] bg-[#1CDAC4] px-6 py-10 sm:px-10 sm:py-12 max-w-2xl shadow-[0_30px_120px_rgba(0,0,0,0.35)]">
+          <div className="mx-auto mb-6 h-24 w-24 overflow-hidden rounded-full ring-4 ring-teal-300/60 shadow bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            {data.company ? <span className="text-3xl font-bold text-white">{data.company.charAt(0).toUpperCase()}</span> : <div />}
           </div>
           <div className="grid grid-cols-1 gap-3">
-            <Tag label="HỌ VÀ TÊN" field="name" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Tag label="BẰNG CẤP" field="degree" variant="long" />
-              <Tag label="NGOẠI NGỮ" field="languagesText" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Tag label="KINH NGHIỆM 1" field="exp1" variant="long" />
-              <Tag label="KINH NGHIỆM 2" field="exp2" variant="long" />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Tag label="NĂNG LỰC 1" field="skill1" />
-              <Tag label="NĂNG LỰC 2" field="skill2" />
-            </div>
+            <Tag label="TÊN CÔNG TY" field="company" />
+            <Tag label="VỊ TRÍ" field="title" />
+            <LongDescription label="MÔ TẢ CÔNG VIỆC" field="description" />
           </div>
         </div>
         {error && <p className="mt-4 text-red-300">{error}</p>}
@@ -95,5 +99,3 @@ export default function CandidateReviewFromServer() {
     </div>
   )
 }
-
-

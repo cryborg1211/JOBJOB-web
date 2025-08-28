@@ -51,7 +51,7 @@ def _read_docx(bytes_data: bytes):
 
 
 YEAR = r'(19|20)\d{2}'
-YEAR_RANGE = re.compile(rf'(?i)\b{YEAR}\b.*?\b({YEAR}\b|present|hiện tại)')
+YEAR_RANGE = re.compile(rf'(?i)\b{YEAR}\b.*?\b({YEAR}\b|present|ongoing|hiện tại)')
 
 
 def _guess_name(lines):
@@ -66,9 +66,132 @@ def _guess_name(lines):
     return ''
 
 
-def _guess_degree(text):
-    m = re.search(r'(?i)Bachelor|Engineer|Master|PhD|Đại học|Cử nhân|Thạc sĩ|Tiến sĩ', text)
-    return m.group(0) if m else ''
+def split_sections(text):
+    """Split text into sections based on common headings"""
+    sections = {}
+    
+    # Common section patterns
+    patterns = {
+        'edu': re.compile(r'(?i)\b(education|học vấn|bằng cấp|trình độ)\b'),
+        'ach': re.compile(r'(?i)\bkey achievements?\b|\bachievements?\b|\bthành tựu\b'),
+        'exp': re.compile(r'(?i)\b(experience|kinh nghiệm|làm việc)\b'),
+        'skill': re.compile(r'(?i)\b(skills?|kỹ năng|năng lực)\b'),
+        'lang': re.compile(r'(?i)\b(languages?|ngoại ngữ|tiếng)\b')
+    }
+    
+    lines = text.split('\n')
+    current_section = None
+    current_content = []
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Check if line matches any section heading
+        matched_section = None
+        for section, pattern in patterns.items():
+            if pattern.search(line):
+                matched_section = section
+                break
+        
+        if matched_section:
+            # Save previous section
+            if current_section and current_content:
+                sections[current_section] = '\n'.join(current_content).strip()
+            
+            # Start new section
+            current_section = matched_section
+            current_content = [line]
+        elif current_section:
+            current_content.append(line)
+    
+    # Save last section
+    if current_section and current_content:
+        sections[current_section] = '\n'.join(current_content).strip()
+    
+    return sections
+
+
+def extract_education_recent(edu_text):
+    """Extract the most recent education entry with year range"""
+    if not edu_text:
+        return ""
+    
+    # Find year ranges in the text
+    year_matches = list(YEAR_RANGE.finditer(edu_text))
+    if not year_matches:
+        return edu_text.split('\n')[0].strip() if edu_text else ""
+    
+    # Find the most recent education entry
+    best_match = None
+    best_year = 0
+    
+    for match in year_matches:
+        start_year = int(match.group(1))
+        end_year_str = match.group(2)
+        
+        # Handle "present", "ongoing", "hiện tại"
+        if re.search(r'(?i)present|ongoing|hiện tại', end_year_str):
+            end_year = 9999  # Consider ongoing as most recent
+        else:
+            end_year = int(end_year_str) if end_year_str.isdigit() else start_year
+        
+        # Choose the entry with the highest end year (most recent)
+        if end_year > best_year:
+            best_year = end_year
+            best_match = match
+    
+    if not best_match:
+        return edu_text.split('\n')[0].strip()
+    
+    # Extract the education entry around the year range
+    start_pos = max(0, best_match.start() - 100)
+    end_pos = min(len(edu_text), best_match.end() + 100)
+    
+    entry_text = edu_text[start_pos:end_pos].strip()
+    
+    # Try to extract degree and school
+    lines = entry_text.split('\n')
+    if len(lines) >= 2:
+        # First line might be degree, second might be school
+        degree = lines[0].strip()
+        school = lines[1].strip()
+        
+        # Clean up the year range
+        year_range = best_match.group(0).replace('–', '-').replace('—', '-')
+        
+        return f"{degree} — {school} ({year_range})"
+    else:
+        # Fallback: return the entry with year range
+        return entry_text
+
+
+def extract_achievements(ach_text):
+    """Extract achievements from text, limiting to top 3 reasonable length items"""
+    if not ach_text:
+        return []
+    
+    # Remove the heading
+    body = re.sub(r'(?i)\bkey achievements?\b|\bachievements?\b|\bthành tựu\b', '', ach_text, 1)
+    
+    # Split by bullet points
+    items = re.split(r'(?:\n|\r|^)[\-\–\•\*]\s*', body)
+    items = [re.sub(r'\s{2,}', ' ', i).strip(" -–•*") for i in items if len(i.strip()) > 3]
+    
+    # Fallback: split by lines if no bullet points found
+    if len(items) <= 1:
+        items = [l.strip() for l in body.splitlines() if len(l.strip()) > 5]
+    
+    # Filter by reasonable length and limit to top 3
+    out = []
+    for s in items:
+        if 5 <= len(s) <= 280:
+            out.append(s)
+        if len(out) == 3:
+            break
+    
+    return out
 
 
 def _guess_languages(text):
@@ -109,19 +232,27 @@ def extract_profile(file_stream, filename):
         raise ValueError('Unsupported file type')
 
     lines = [l for l in (text or '').splitlines() if l.strip()]
+    
+    # Split text into sections
+    sections = split_sections(text)
+    
     name = _guess_name(lines)
-    degree = _guess_degree(text)
+    degree = extract_education_recent(sections.get("edu", ""))
     languages = _guess_languages(text)
     experiences = _guess_experiences(lines)
     skills = _guess_skills(text)
+    achievements = extract_achievements(sections.get("ach", ""))
+    
     if not avatar:
         avatar = _placeholder_avatar(name or 'User')
+    
     return {
         'name': name,
         'degree': degree,
         'languages': languages,
         'experiences': experiences,
         'skills': skills,
+        'achievements': achievements,
         'avatar_data_url': avatar,
     }
 
