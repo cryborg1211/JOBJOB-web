@@ -5,7 +5,11 @@ function ButtonPill({ to, label }) {
   return (
     <Link
       to={to}
-      className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-teal-400 to-emerald-400 px-10 py-5 text-base sm:text-lg font-semibold text-black tracking-wide shadow-[0_10px_40px_rgba(0,0,0,0.3)] hover:brightness-105 active:translate-y-px focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 transition"
+      className="w-full min-h-[84px] rounded-full bg-teal-400 text-black 
+                 font-semibold text-xl tracking-wide 
+                 px-8 py-5 shadow-[0_18px_60px_rgba(0,0,0,0.35)]
+                 hover:bg-teal-300 active:translate-y-[1px] 
+                 transition flex items-center justify-center"
     >
       {label}
     </Link>
@@ -23,17 +27,27 @@ export default function RoleSelect() {
       </div>
       <Navbar />
 
-      <section className="mx-auto w-full max-w-7xl px-4 pt-6 pb-8 flex flex-col items-center justify-center h-[calc(100vh-4rem)] text-center">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extralight tracking-wide">
-          Chào Mừng Bạn Đến Với JobJob
-        </h1>
-        <h2 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-extrabold">
-          Bạn Là Ai ?
-        </h2>
+      <section className="relative">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <h1 className="text-center text-4xl sm:text-5xl font-extrabold leading-tight">
+            Chào Mừng Bạn Đến Với JobJob
+          </h1>
+          <p className="mt-4 text-center text-3xl sm:text-4xl font-extrabold">
+            Bạn Là Ai ?
+          </p>
 
-        <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:justify-center">
-          <ButtonPill to="/employer/upload" label="NHÀ TUYỂN DỤNG" />
-          <ButtonPill to="/candidate/upload" label="ỨNG VIÊN" />
+          {/* Hàng chứa 2 nút: grid 2 cột md+, 1 cột mobile */}
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
+            {/* Cột 1 */}
+            <div className="flex">
+              <ButtonPill to="/employer/upload" label="NHÀ TUYỂN DỤNG" />
+            </div>
+
+            {/* Cột 2 */}
+            <div className="flex">
+              <ButtonPill to="/candidate/upload" label="ỨNG VIÊN" />
+            </div>
+          </div>
         </div>
       </section>
     </div>

@@ -13,7 +13,7 @@ export default function Navbar() {
           <Link to="/" className="hover:text-white transition-colors">Giới thiệu</Link>
           <Link to="/" className="hover:text-white transition-colors">Liên Hệ</Link>
           <Link to="/pricing" className="hover:text-white transition-colors">Gói Cước</Link>
-          <Link to="/" className="hover:text-white transition-colors">Đăng Ký</Link>
+          <Link to="/signup" className="hover:text-white transition-colors">Đăng Ký</Link>
         </nav>
       </div>
     </header>

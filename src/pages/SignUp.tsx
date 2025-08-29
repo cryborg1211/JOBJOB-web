@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ROUTE_TRIAL } from "../routes";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:5000";
@@ -61,12 +61,12 @@ export default function SignUp() {
 
       {/* Top bar gọn */}
       <header className="h-16 flex items-center justify-between px-6">
-        <div className="font-semibold tracking-tight">JobJob</div>
+        <Link to="/" className="font-semibold tracking-tight hover:text-teal-300 transition-colors">JobJob</Link>
         <nav className="hidden gap-8 text-sm md:flex">
-          <a className="hover:text-teal-300 transition-colors" href="#gioi-thieu">Giới thiệu</a>
-          <a className="hover:text-teal-300 transition-colors" href="#lien-he">Liên Hệ</a>
-          <a className="hover:text-teal-300 transition-colors" href="#goi-cuoc">Gói Cước</a>
-          <a className="hover:text-teal-300 transition-colors" href="#dang-ky">Đăng Ký</a>
+          <Link to="/" className="hover:text-teal-300 transition-colors">Giới thiệu</Link>
+          <Link to="/" className="hover:text-teal-300 transition-colors">Liên Hệ</Link>
+          <Link to="/pricing" className="hover:text-teal-300 transition-colors">Gói Cước</Link>
+          <Link to="/signup" className="hover:text-teal-300 transition-colors">Đăng Ký</Link>
         </nav>
       </header>
 

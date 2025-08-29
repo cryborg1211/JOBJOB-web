@@ -25,12 +25,6 @@ export default function LandingPage() {
                  >
                    SUBSCRIBE
                  </button>
-                 <button 
-                   onClick={() => nav("/signup")}
-                   className="px-6 py-3 rounded-full bg-white text-slate-900 font-semibold hover:bg-gray-100 transition"
-                 >
-                   SIGN UP
-                 </button>
                  <Link to="/trial" className="rounded-full border border-white/25 px-6 py-3 font-medium hover:border-white/60 hover:bg-white/5 transition">FREE TRIAL</Link>
                </div>
             </div>
@@ -109,7 +103,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="rounded-[32px] p-12 md:p-16 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-white/10">
             <p className="text-center text-emerald-200/90">BẠN ĐÃ SẴN SÀNG CHƯA?</p>
-            <h3 className="mt-3 text-center text-4xl md:text-5xl font-extrabold">Tuyển Dụng Thời Đại<br/>Mới, Bắt Đầu Từ Bạn</h3>
+            <h3 className="mt-3 text-center text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.44]">Tuyển Dụng Thời Đại<br/>Mới, Bắt Đầu Từ Bạn</h3>
             <div className="mt-8 flex justify-center">
               <button 
                 onClick={() => nav("/pricing")}
