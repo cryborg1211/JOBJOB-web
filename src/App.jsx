@@ -9,11 +9,15 @@ import EmployerUpload from "./pages/EmployerUpload.jsx";
 import EmployerReview from "./pages/EmployerReview.jsx";
 import EmployerReviewFromServer from "./pages/EmployerReviewFromServer.jsx";
 import JobSwipe from "./pages/JobSwipe.jsx";
+import Pricing from "./pages/Pricing.jsx";
+import SignUp from "./pages/SignUp.jsx";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/signup" element={<SignUp />} />
       <Route path="/trial" element={<RoleSelect />} />
       <Route path="/candidate/upload" element={<CandidateUpload />} />
       <Route path="/candidate/new" element={<CandidateNew />} />

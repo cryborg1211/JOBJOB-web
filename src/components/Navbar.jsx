@@ -10,10 +10,10 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-10 text-sm text-white/80">
-          <a href="#" className="hover:text-white">Giới thiệu</a>
-          <a href="#" className="hover:text-white">Liên Hệ</a>
-          <a href="#" className="hover:text-white">Gói Cước</a>
-          <a href="#" className="hover:text-white">Đăng Ký</a>
+          <Link to="/" className="hover:text-white transition-colors">Giới thiệu</Link>
+          <Link to="/" className="hover:text-white transition-colors">Liên Hệ</Link>
+          <Link to="/pricing" className="hover:text-white transition-colors">Gói Cước</Link>
+          <Link to="/" className="hover:text-white transition-colors">Đăng Ký</Link>
         </nav>
       </div>
     </header>
