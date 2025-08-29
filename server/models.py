@@ -30,3 +30,40 @@ class Candidate(db.Model):
         }
 
 
+class JobPosting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    company = db.Column(db.String(160))
+    title = db.Column(db.String(160))
+    description = db.Column(db.Text)             # JD gộp cuối
+    summary = db.Column(db.Text)
+    responsibilities = db.Column(db.Text)        # JSON string list
+    requirements = db.Column(db.Text)            # JSON string list
+    skills = db.Column(db.Text)                  # JSON string list
+    location = db.Column(db.String(160))
+    employment_type = db.Column(db.String(60))
+    salary = db.Column(db.String(120))
+    languages = db.Column(db.Text)               # JSON string list
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        import json
+        j = lambda s: (json.loads(s) if s else [])
+        return {
+          "id": self.id, "company": self.company or "", "title": self.title or "",
+          "description": self.description or "", "summary": self.summary or "",
+          "responsibilities": j(self.responsibilities),
+          "requirements": j(self.requirements), "skills": j(self.skills),
+          "location": self.location or "", "employment_type": self.employment_type or "",
+          "salary": self.salary or "", "languages": j(self.languages)
+        }
+
+
+class SwipeDecision(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    candidate_id = db.Column(db.Integer, nullable=True)
+    job_id = db.Column(db.String(80), index=True)
+    action = db.Column(db.String(10))  # 'skip' | 'apply'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+

@@ -4,7 +4,10 @@ import json
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from db import init_db, db
-from models import Candidate
+from models import Candidate, JobPosting, SwipeDecision
+from utils.parse_resume import extract_profile
+from utils.parse_jd import parse_jd
+from utils.jobs_feed import load_jobs_df, job_row_to_dict
 
 app = Flask(__name__, static_url_path='', static_folder='.')
 CORS(app)
@@ -14,6 +17,14 @@ init_db(app)
 
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'uploads', 'avatars')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Cache nhẹ
+_JOBS_DF = None
+def get_df():
+    global _JOBS_DF
+    if _JOBS_DF is None:
+        _JOBS_DF = load_jobs_df()
+    return _JOBS_DF
 
 
 @app.route('/uploads/avatars/<path:filename>')
@@ -114,7 +125,156 @@ def update_candidate(cid):
 
 @app.post('/api/parse-resume')
 def deprecated_parse():
-    return jsonify({'error': 'Endpoint deprecated'}), 410
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'Missing file field'}), 400
+        f = request.files['file']
+        filename = f.filename or ''
+        ext = '.' + filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+        if ext not in {'.pdf', '.doc', '.docx'}:
+            return jsonify({'error': 'Only PDF, DOC, DOCX are allowed'}), 400
+        f.seek(0, 2); size = f.tell(); f.seek(0)
+        if size > 10 * 1024 * 1024:
+            return jsonify({'error': 'File size must be ≤ 10MB'}), 400
+        data = extract_profile(f.stream, filename)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.post('/api/parse-jd')
+def parse_jd_api():
+    try:
+        f = request.files.get('file')
+        if not f:
+            return jsonify({'error': 'Thiếu file'}), 400
+        
+        ok_ext = {'.pdf', '.doc', '.docx', '.txt'}
+        from pathlib import Path
+        ext = Path(f.filename).suffix.lower()
+        if ext not in ok_ext:
+            return jsonify({'error': 'Chỉ nhận PDF/DOC/DOCX/TXT'}), 400
+        
+        f.seek(0, 2)
+        size = f.tell()
+        f.seek(0)
+        if size > 10 * 1024 * 1024:
+            return jsonify({'error': 'File size must be ≤ 10MB'}), 400
+        
+        data = parse_jd(f.stream, f.filename)
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.post('/api/jobs')
+def create_job():
+    try:
+        j = request.get_json() or {}
+        job = JobPosting(
+            company=j.get('company', ''),
+            title=j.get('title', ''),
+            description=j.get('description', ''),
+            summary=j.get('summary', ''),
+            responsibilities=json.dumps(j.get('responsibilities', []), ensure_ascii=False),
+            requirements=json.dumps(j.get('requirements', []), ensure_ascii=False),
+            skills=json.dumps(j.get('skills', []), ensure_ascii=False),
+            location=j.get('location', ''),
+            employment_type=j.get('employment_type', ''),
+            salary=j.get('salary', ''),
+            languages=json.dumps(j.get('languages', []), ensure_ascii=False),
+        )
+        db.session.add(job)
+        db.session.commit()
+        return jsonify({'id': job.id}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.get('/api/jobs/<int:id>')
+def get_job(id):
+    job = db.session.get(JobPosting, id)
+    if not job:
+        return jsonify({'error': 'Not found'}), 404
+    return jsonify(job.to_dict()), 200
+
+
+@app.put('/api/jobs/<int:id>')
+def update_job(id):
+    job = db.session.get(JobPosting, id)
+    if not job:
+        return jsonify({'error': 'Not found'}), 404
+    
+    try:
+        j = request.get_json() or {}
+        
+        if 'company' in j:
+            job.company = j['company']
+        if 'title' in j:
+            job.title = j['title']
+        if 'description' in j:
+            job.description = j['description']
+        if 'summary' in j:
+            job.summary = j['summary']
+        if 'responsibilities' in j:
+            job.responsibilities = json.dumps(j['responsibilities'], ensure_ascii=False)
+        if 'requirements' in j:
+            job.requirements = json.dumps(j['requirements'], ensure_ascii=False)
+        if 'skills' in j:
+            job.skills = json.dumps(j['skills'], ensure_ascii=False)
+        if 'location' in j:
+            job.location = j['location']
+        if 'employment_type' in j:
+            job.employment_type = j['employment_type']
+        if 'salary' in j:
+            job.salary = j['salary']
+        if 'languages' in j:
+            job.languages = json.dumps(j['languages'], ensure_ascii=False)
+        
+        db.session.commit()
+        return jsonify(job.to_dict()), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.get('/api/jobs')
+def api_jobs():
+    """Trả danh sách job để quẹt: ?offset=0&limit=20"""
+    try:
+        offset = int(request.args.get("offset", 0))
+        limit = min(int(request.args.get("limit", 20)), 50)
+    except:
+        return {"error": "offset/limit không hợp lệ"}, 400
+    
+    try:
+        df = get_df()
+        end = min(offset + limit, len(df))
+        rows = [job_row_to_dict(df.iloc[i].to_dict()) for i in range(offset, end)]
+        return {"items": rows, "nextOffset": end if end < len(df) else None}
+    except Exception as e:
+        return {"error": f"Lỗi load jobs: {str(e)}"}, 500
+
+
+@app.post('/api/decisions')
+def api_decisions():
+    """Lưu hành động quẹt: {candidate_id?, job_id, action: 'skip'|'apply'}"""
+    try:
+        j = request.get_json() or {}
+        job_id = str(j.get("job_id", "")).strip()
+        action = j.get("action", "")
+        if not job_id or action not in ("skip", "apply"):
+            return {"error": "Thiếu job_id/action"}, 400
+        
+        cand_id = j.get("candidate_id")  # có thể None
+        rec = SwipeDecision(candidate_id=cand_id, job_id=job_id, action=action)
+        db.session.add(rec)
+        db.session.commit()
+        return {"ok": True, "id": rec.id}
+    except Exception as e:
+        db.session.rollback()
+        return {"error": f"Lỗi lưu decision: {str(e)}"}, 500
 
 
 if __name__ == '__main__':

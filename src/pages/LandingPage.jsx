@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 
 export default function LandingPage() {
+  const nav = useNavigate();
+  
   return (
     <div className="min-h-screen bg-[#071a1d] text-white">
       <Navbar />
@@ -16,21 +18,41 @@ export default function LandingPage() {
                 Lướt Để Tìm<br/>Việc, Match<br/>Để Thành<br/>Công
               </h1>
               <p className="mt-6 text-white/70 max-w-xl">Lướt trái bỏ qua, quẹt phải là có việc – JobJob, nơi cơ hội tìm đến bạn chỉ sau một cú click</p>
-              <div className="mt-8 flex gap-4">
-                <button className="px-6 py-3 rounded-full bg-emerald-400 text-slate-900 font-semibold">SUBSCRIBE</button>
-                <Link to="/trial" className="rounded-full border border-white/25 px-6 py-3 font-medium hover:border-white/60 hover:bg-white/5 transition">FREE TRIAL</Link>
-              </div>
+                             <div className="mt-8 flex gap-4">
+                 <button 
+                   onClick={() => nav("/pricing")}
+                   className="px-6 py-3 rounded-full bg-emerald-400 text-slate-900 font-semibold hover:bg-emerald-300 transition"
+                 >
+                   SUBSCRIBE
+                 </button>
+                 <Link to="/trial" className="rounded-full border border-white/25 px-6 py-3 font-medium hover:border-white/60 hover:bg-white/5 transition">FREE TRIAL</Link>
+               </div>
             </div>
-            <div className="flex justify-center lg:justify-end">
-              <div className="w-[420px] h-[380px] bg-gradient-to-br from-indigo-400/20 to-cyan-300/20 rounded-3xl border border-white/10 backdrop-blur-sm shadow-[0_0_120px_rgba(27,210,197,0.25)]" />
-            </div>
+                         <div className="relative w-full max-w-[560px] mx-auto md:mx-0 overflow-visible">
+               {/* Monitor */}
+               <img
+                 src="/src/assets/Other 07.png"
+                 alt="JobJob UI"
+                 className="relative z-10 w-full h-auto object-contain select-none pointer-events-none"
+                 aria-hidden
+               />
+
+               {/* Logo chữ J – lệch xuống & sang phải theo mock */}
+               <img
+                 src="/src/assets/jobjob_logo.png"
+                 alt="JobJob J Logo"
+                 className="
+                   absolute z-20 
+                   -right-[2%]  bottom-[20%]      /* default mobile - nhích lên 30% */
+                   md:-right-[4%] md:bottom-[16%] /* tablet/desktop - nhích lên 30% */
+                   w-[168px] md:w-[224px] lg:w-[258px]
+                   drop-shadow-[0_16px_60px_rgba(0,0,0,0.35)]
+                   select-none pointer-events-none
+                 "
+               />
+             </div>
           </div>
-          <div className="mt-14 text-white/60 text-sm">Featured on</div>
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-6 opacity-80">
-            {['TechCrunch','FastCompany','MIT','Forbes','WIRED','TheVerge'].map((x)=> (
-              <div key={x} className="h-8 rounded bg-white/5 border border-white/10 flex items-center justify-center text-xs text-white/60">{x}</div>
-            ))}
-          </div>
+
         </div>
       </section>
 
@@ -44,7 +66,12 @@ export default function LandingPage() {
             <p className="text-emerald-300/80 mb-3">Thuật toán thông minh</p>
             <h2 className="text-4xl md:text-5xl font-extrabold leading-tight">Kết Nối Các<br/>Hồ Sơ Làm<br/>Việc Phù Hợp<br/>Với Mô Tả</h2>
             <p className="mt-6 text-white/70 max-w-xl">Áp dụng thuật toán matching vào quá trình recommend việc làm phù hợp với hồ sơ người dùng</p>
-            <button className="mt-8 px-6 py-3 rounded-full bg-emerald-400 text-slate-900 font-semibold">SUBSCRIBE</button>
+            <button 
+              onClick={() => nav("/pricing")}
+              className="mt-8 px-6 py-3 rounded-full bg-emerald-400 text-slate-900 font-semibold hover:bg-emerald-300 transition"
+            >
+              SUBSCRIBE
+            </button>
           </div>
         </div>
       </section>
@@ -56,7 +83,12 @@ export default function LandingPage() {
             <p className="text-white/60">Tối ưu hoá quá trình tuyển dụng</p>
             <h2 className="mt-4 text-4xl md:text-5xl font-extrabold leading-tight">Loại Bỏ Quá<br/>Trình Sàn<br/>Lọc Bằng<br/>Tay Cho Nhà<br/>Tuyển Dụng</h2>
             <p className="mt-6 text-white/70 max-w-xl">Tiết kiệm thời gian trong quy trình sàn lọc CV của ứng viên</p>
-            <button className="mt-8 px-6 py-3 rounded-full bg-emerald-400 text-slate-900 font-semibold">SUBSCRIBE</button>
+            <button 
+              onClick={() => nav("/pricing")}
+              className="mt-8 px-6 py-3 rounded-full bg-emerald-400 text-slate-900 font-semibold hover:bg-emerald-300 transition"
+            >
+              SUBSCRIBE
+            </button>
           </div>
           <div className="grid gap-4">
             <div className="h-16 rounded-2xl bg-gradient-to-r from-sky-400/20 to-violet-400/20 border border-white/10" />
@@ -71,9 +103,14 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="rounded-[32px] p-12 md:p-16 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 border border-white/10">
             <p className="text-center text-emerald-200/90">BẠN ĐÃ SẴN SÀNG CHƯA?</p>
-            <h3 className="mt-3 text-center text-4xl md:text-5xl font-extrabold">Tuyển Dụng Thời Đại<br/>Mới, Bắt Đầu Từ Bạn</h3>
+            <h3 className="mt-3 text-center text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.44]">Tuyển Dụng Thời Đại<br/>Mới, Bắt Đầu Từ Bạn</h3>
             <div className="mt-8 flex justify-center">
-              <button className="px-6 py-3 rounded-full bg-black/70 text-white border border-white/10">Xem Các Gói Thành Viên</button>
+              <button 
+                onClick={() => nav("/pricing")}
+                className="px-6 py-3 rounded-full bg-black/70 text-white border border-white/10 hover:bg-black/50 transition"
+              >
+                Xem Các Gói Thành Viên
+              </button>
             </div>
           </div>
         </div>
