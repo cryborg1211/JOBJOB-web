@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, useMotionValue, useTransform, AnimatePresence, useAnimation } from "framer-motion";
 import { API_BASE } from "../lib/config";
 
@@ -21,7 +22,7 @@ function ChatSidebar() {
 }
 
 // ========= Card riêng lẻ =========
-function JobCard({ job, draggingX, onDragEnd }) {
+function JobCard({ job, draggingX, onDragEnd, overrideScore, overrideFeatures }) {
   // Avatar = ký tự đầu công ty
   const avatar = (job.company || "?").slice(0, 1).toUpperCase();
   return (
@@ -34,7 +35,7 @@ function JobCard({ job, draggingX, onDragEnd }) {
     >
       {/* Badge độ tương thích (placeholder) */}
       <div className="absolute right-6 top-4 rounded-full bg-white/70 text-black/80 px-4 py-1 text-[13px] font-semibold">
-        Độ tương thích: —%
+        Độ tương thích: {overrideScore?.percent || '—%'}
       </div>
 
       {/* Avatar */}
@@ -54,14 +55,14 @@ function JobCard({ job, draggingX, onDragEnd }) {
 
              {/* Description */}
        <div className="mt-4 rounded-[18px] bg-[#0EA89A] text-white/95 px-5 py-4 min-h-32 max-h-32 whitespace-pre-wrap break-words overflow-hidden">
-         {job.description || "Mô tả công việc"}
+         {overrideFeatures && overrideFeatures.length ? overrideFeatures.join(' • ') : (job.description || "Mô tả công việc")}
        </div>
     </motion.div>
   );
 }
 
 // ========= Stack 3 thẻ =========
-function Deck({ queue, peekBlurPx, onSwipe }) {
+function Deck({ queue, peekBlurPx, onSwipe, overrideScore, overrideFeatures }) {
   // Top 3 items hiển thị
   const cards = useMemo(() => queue.slice(0, 3), [queue]);
 
@@ -109,7 +110,7 @@ function Deck({ queue, peekBlurPx, onSwipe }) {
       {/* Card trên cùng (draggable) */}
       {cards[0] && (
         <motion.div style={{ rotate }} className="relative">
-          <JobCard job={cards[0]} draggingX={x} onDragEnd={handleDragEnd} />
+          <JobCard job={cards[0]} draggingX={x} onDragEnd={handleDragEnd} overrideScore={overrideScore} overrideFeatures={overrideFeatures} />
         </motion.div>
       )}
     </div>
@@ -120,6 +121,14 @@ export default function JobSwipe() {
   const [queue, setQueue] = useState([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const stateData = location && location.state;
+  const persisted = (() => { 
+    try { 
+      return JSON.parse(localStorage.getItem('lastMatch')||'null') || JSON.parse(localStorage.getItem('lastResult')||'null'); 
+    } catch { return null } 
+  })();
+  const scoreData = stateData || persisted || null;
 
   async function fetchMore() {
     if (loading) return;
@@ -196,7 +205,7 @@ export default function JobSwipe() {
           <div className="px-4">
             <AnimatePresence initial={false} mode="popLayout">
               {top ? (
-                <Deck key={top.id} queue={queue} onSwipe={handleSwipe} peekBlurPx={10} />
+                <Deck key={top.id} queue={queue} onSwipe={handleSwipe} peekBlurPx={10} overrideScore={scoreData} overrideFeatures={scoreData?.features} />
               ) : (
                 <div className="grid place-items-center h-[60vh] opacity-80">
                   Hết job để quẹt — quay lại sau nha!

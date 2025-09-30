@@ -128,7 +128,7 @@ export default function SignUp() {
                 {/* ĐĂNG NHẬP (đi sang /login nếu có) */}
                 <button
                   type="button"
-                  onClick={() => window.location.assign("/login")}
+                  onClick={() => nav(ROUTE_TRIAL)}
                   className="rounded-full bg-emerald-400 px-8 py-3 font-semibold text-black hover:bg-emerald-300"
                 >
                   ĐĂNG NHẬP
