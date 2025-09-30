@@ -6,6 +6,7 @@ import CandidateNew from "./pages/CandidateNew.jsx";
 import CandidateReviewFromServer from "./pages/CandidateReviewFromServer.jsx";
 import CandidateUpload from "./pages/CandidateUpload.jsx";
 import EmployerUpload from "./pages/EmployerUpload.jsx";
+import UploadForHR from "./pages/UploadForHR.tsx";
 import EmployerReview from "./pages/EmployerReview.jsx";
 import EmployerReviewFromServer from "./pages/EmployerReviewFromServer.jsx";
 import JobSwipe from "./pages/JobSwipe.jsx";
@@ -23,10 +24,11 @@ export default function App() {
       <Route path="/candidate/new" element={<CandidateNew />} />
       <Route path="/candidate/review" element={<CandidateReview />} />
       <Route path="/candidate/review/:id" element={<CandidateReviewFromServer />} />
-      <Route path="/employer/upload" element={<EmployerUpload />} />
+      <Route path="/upload" element={<UploadForHR />} />
+      <Route path="/employer/upload" element={<UploadForHR />} />
       <Route path="/employer/review" element={<EmployerReview />} />
       <Route path="/employer/review/:id" element={<EmployerReviewFromServer />} />
-      <Route path="/jobs/browse" element={<JobSwipe />} />
+      <Route path="/browse" element={<JobSwipe />} />
     </Routes>
   );
 }

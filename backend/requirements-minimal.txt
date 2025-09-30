@@ -1,0 +1,10 @@
+# Minimal requirements for Windows without compilation
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+nltk
+beautifulsoup4
+scikit-learn
+rapidfuzz
+requests

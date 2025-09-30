@@ -40,7 +40,7 @@ export default function RoleSelect() {
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-4xl mx-auto">
             {/* Cột 1 */}
             <div className="flex">
-              <ButtonPill to="/employer/upload" label="NHÀ TUYỂN DỤNG" />
+              <ButtonPill to="/upload" label="NHÀ TUYỂN DỤNG" />
             </div>
 
             {/* Cột 2 */}

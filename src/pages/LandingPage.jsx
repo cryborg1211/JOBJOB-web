@@ -25,7 +25,7 @@ export default function LandingPage() {
                  >
                    SUBSCRIBE
                  </button>
-                 <Link to="/trial" className="rounded-full border border-white/25 px-6 py-3 font-medium hover:border-white/60 hover:bg-white/5 transition">FREE TRIAL</Link>
+                <Link to="/signup" className="rounded-full border border-white/25 px-6 py-3 font-medium hover:border-white/60 hover:bg-white/5 transition">FREE TRIAL</Link>
                </div>
             </div>
                          <div className="relative w-full max-w-[560px] mx-auto md:mx-0 overflow-visible">
